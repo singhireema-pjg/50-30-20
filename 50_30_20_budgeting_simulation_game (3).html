@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>50/30/20 Budgeting Quest: Pro Challenge Edition</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Fredoka', 'sans-serif'],
+          },
+          colors: {
+            need: '#06b6d4', // Cyan
+            want: '#f59e0b', // Amber
+            save: '#10b981', // Emerald
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    .pulse-glow {
+      animation: pulseGlow 2s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
+      100% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.6); }
+    }
+    .shake-anim {
+      animation: shake 0.4s ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased bg-slate-900 text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+  <!-- Top Navigation / Progress Header -->
+  <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-emerald-400 flex items-center justify-center text-slate-900 font-bold text-xl shadow-lg">
+          <i class="fa-solid fa-chart-pie"></i>
+        </div>
+        <div>
+          <h1 class="font-display text-lg font-bold text-white leading-tight flex items-center gap-2">
+            50/30/20 Quest <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">PRO 12-14</span>
+          </h1>
+          <p class="text-xs text-slate-400">Financial Mastery & Shock Management</p>
+        </div>
+      </div>
+
+      <!-- Score & Financial IQ Display -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-2">
+          <i class="fa-solid fa-brain text-cyan-400 text-sm"></i>
+          <span class="text-xs text-slate-400 hidden sm:inline">Financial IQ:</span>
+          <span id="xp-display" class="font-bold text-cyan-400 font-display">100</span>
+        </div>
+        <button id="btn-sound-toggle" onclick="toggleSound()" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition" title="Toggle Sound">
+          <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Multi-stage Step Tracker Bar -->
+    <div class="bg-slate-900/70 border-t border-slate-800 py-2 px-4">
+      <div class="max-w-3xl mx-auto flex justify-between items-center text-xs font-semibold">
+        <div id="step-tab-1" class="step-indicator active flex items-center space-x-1 text-cyan-400">
+          <span class="w-5 h-5 rounded-full bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-[10px]">1</span>
+          <span class="hidden md:inline">Nuance Sorting</span>
+        </div>
+        <div class="h-0.5 bg-slate-700 flex-1 mx-2"></div>
+        <div id="step-tab-2" class="step-indicator flex items-center space-x-1 text-slate-500">
+          <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">2</span>
+          <span class="hidden md:inline">Math Breakdown</span>
+        </div>
+        <div class="h-0.5 bg-slate-700 flex-1 mx-2"></div>
+        <div id="step-tab-3" class="step-indicator flex items-center space-x-1 text-slate-500">
+          <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">3</span>
+          <span class="hidden md:inline">Compound Twist</span>
+        </div>
+        <div class="h-0.5 bg-slate-700 flex-1 mx-2"></div>
+        <div id="step-tab-4" class="step-indicator flex items-center space-x-1 text-slate-500">
+          <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">4</span>
+          <span class="hidden md:inline">Trade-Off Matrix</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Container -->
+  <main class="max-w-4xl mx-auto w-full p-4 sm:p-6 flex-1 flex flex-col justify-center">
+
+    <!-- Intro Card (Stage 0) -->
+    <section id="stage-intro" class="bg-slate-800/90 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl relative overflow-hidden text-center space-y-6">
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-cyan-400 via-indigo-500 to-emerald-400 p-0.5 shadow-xl">
+        <div class="w-full h-full bg-slate-900 rounded-[22px] flex items-center justify-center text-4xl">
+          🧠
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">50/30/20 Pro Challenge</h2>
+        <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto">
+          You earn a monthly income of <span class="font-bold text-emerald-400 font-mono">₹2,400</span> (from tutoring, pet-sitting, and allowance). Can you apply the 50/30/20 framework, handle complex math, and survive real-life budget shocks?
+        </p>
+      </div>
+
+      <!-- Quick Rule Breakdown Infographic Box -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-cyan-500/30 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">50% Needs</span>
+            <span class="text-xs font-mono font-bold text-cyan-400">Essential Math</span>
+          </div>
+          <p class="text-xs text-slate-400">Things required to function: school transport, basic phone data, required textbooks, health care.</p>
+        </div>
+
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-amber-500/30 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">30% Wants</span>
+            <span class="text-xs font-mono font-bold text-amber-400">Discretionary</span>
+          </div>
+          <p class="text-xs text-slate-400">Upgrades & fun: gaming passes, cinema snacks, designer gear, hangouts with friends.</p>
+        </div>
+
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-emerald-500/30 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">20% Savings</span>
+            <span class="text-xs font-mono font-bold text-emerald-400">Future Wealth</span>
+          </div>
+          <p class="text-xs text-slate-400">Future goals & Emergency Cushion: tech upgrades, bicycle goal, emergency buffer.</p>
+        </div>
+      </div>
+
+      <div>
+        <button onclick="startSimulation()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-display font-bold text-lg rounded-xl shadow-lg transform hover:-translate-y-0.5 transition active:translate-y-0">
+          Launch Challenge <i class="fa-solid fa-bolt ml-2"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Stage 1: Advanced Categorization Quest -->
+    <section id="stage-1" class="hidden bg-slate-800/90 rounded-2xl p-5 sm:p-7 border border-slate-700 shadow-2xl space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-700/80 pb-4">
+        <div>
+          <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Round 1: Financial Literacy Check</span>
+          <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Categorize Nuanced Expenses</h2>
+        </div>
+        <p class="text-xs text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700">
+          Beware of "Disguised Wants"!
+        </p>
+      </div>
+
+      <!-- Items Deck -->
+      <div class="space-y-2">
+        <div class="flex justify-between items-center text-xs font-semibold text-slate-400 uppercase">
+          <span>Current Line Item:</span>
+          <span id="sort-difficulty-tag" class="text-amber-400 font-mono">Difficulty: Moderate</span>
+        </div>
+        <div id="active-item-card" class="bg-slate-900 p-4 sm:p-5 rounded-xl border-2 border-dashed border-cyan-500/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
+          <div class="flex items-start space-x-3">
+            <div id="item-icon" class="text-3xl bg-slate-800 p-3 rounded-xl">📱</div>
+            <div>
+              <h3 id="item-title" class="font-bold text-white text-base sm:text-lg">Basic Mobile Data Plan</h3>
+              <p id="item-desc" class="text-xs text-slate-300 mt-0.5">Essential data required to submit online school assignments and homework portal.</p>
+              <div id="item-hint" class="text-[11px] text-cyan-400 mt-1 italic hidden">💡 Hint: Ask yourself - will falling behind in school happen without this?</div>
+            </div>
+          </div>
+          <span id="item-cost" class="font-display font-bold text-cyan-400 text-xl whitespace-nowrap">₹300</span>
+        </div>
+      </div>
+
+      <!-- Target Buckets -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <button onclick="sortActiveItem('need')" class="group p-4 bg-slate-900/90 hover:bg-cyan-950/40 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-400 text-left transition space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-display font-bold text-cyan-400 text-base">NEED (50%)</span>
+            <i class="fa-solid fa-circle-check text-cyan-400 opacity-0 group-hover:opacity-100 transition"></i>
+          </div>
+          <p class="text-xs text-slate-400">Essential survival, basic education, required health & transport.</p>
+        </button>
+
+        <button onclick="sortActiveItem('want')" class="group p-4 bg-slate-900/90 hover:bg-amber-950/40 rounded-xl border-2 border-amber-500/30 hover:border-amber-400 text-left transition space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-display font-bold text-amber-400 text-base">WANT (30%)</span>
+            <i class="fa-solid fa-circle-check text-amber-400 opacity-0 group-hover:opacity-100 transition"></i>
+          </div>
+          <p class="text-xs text-slate-400">Upgrades, gaming, snacks, brand-name fashion, entertainment.</p>
+        </button>
+
+        <button onclick="sortActiveItem('save')" class="group p-4 bg-slate-900/90 hover:bg-emerald-950/40 rounded-xl border-2 border-emerald-500/30 hover:border-emerald-400 text-left transition space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-display font-bold text-emerald-400 text-base">SAVINGS (20%)</span>
+            <i class="fa-solid fa-circle-check text-emerald-400 opacity-0 group-hover:opacity-100 transition"></i>
+          </div>
+          <p class="text-xs text-slate-400">Future goals (laptop fund, bike) & Emergency Reserve Fund.</p>
+        </button>
+      </div>
+
+      <!-- Live Feedback Alert -->
+      <div id="sort-feedback" class="hidden p-3.5 rounded-xl text-xs font-medium flex items-center space-x-2 leading-relaxed"></div>
+
+      <!-- Progress Footer -->
+      <div class="flex items-center justify-between pt-2">
+        <span class="text-xs text-slate-400">Item Progress: <span id="sort-progress-count" class="text-white font-bold">1</span> / 6</span>
+        <div class="w-40 bg-slate-700 h-2 rounded-full overflow-hidden">
+          <div id="sort-progress-bar" class="bg-cyan-400 h-full w-1/6 transition-all duration-300"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stage 2: Income Percentage Math Challenge -->
+    <section id="stage-2" class="hidden bg-slate-800/90 rounded-2xl p-5 sm:p-7 border border-slate-700 shadow-2xl space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-700/80 pb-4">
+        <div>
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Round 2: Mathematical Allocation</span>
+          <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Calculate Your 50/30/20 Target</h2>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-400">Monthly Net Income:</span>
+          <p class="font-display font-bold text-emerald-400 text-xl font-mono">₹2,400</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 text-xs sm:text-sm text-slate-300 space-y-2">
+        <p class="font-semibold text-white">📐 Calculate the exact target amount for each category based on ₹2,400 income:</p>
+        <p class="text-xs text-slate-400">Enter your calculated numbers below. (Tip: 50% = half of total; 10% = ₹240)</p>
+      </div>
+
+      <!-- Input Math Challenge Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Needs Input -->
+        <div class="bg-slate-900 p-4 rounded-xl border border-cyan-500/40 space-y-2">
+          <label class="block text-xs font-bold text-cyan-400 uppercase">Needs Target (50%)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-slate-400 font-bold">₹</span>
+            <input type="number" id="math-need-input" placeholder="e.g. 1200" class="w-full bg-slate-800 text-white font-mono font-bold pl-7 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-cyan-400">
+          </div>
+          <p id="math-need-feedback" class="text-[11px] text-slate-400">Calculated: 50% of ₹2,400</p>
+        </div>
+
+        <!-- Wants Input -->
+        <div class="bg-slate-900 p-4 rounded-xl border border-amber-500/40 space-y-2">
+          <label class="block text-xs font-bold text-amber-400 uppercase">Wants Target (30%)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-slate-400 font-bold">₹</span>
+            <input type="number" id="math-want-input" placeholder="e.g. 720" class="w-full bg-slate-800 text-white font-mono font-bold pl-7 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-amber-400">
+          </div>
+          <p id="math-want-feedback" class="text-[11px] text-slate-400">Calculated: 30% of ₹2,400</p>
+        </div>
+
+        <!-- Savings Input -->
+        <div class="bg-slate-900 p-4 rounded-xl border border-emerald-500/40 space-y-2">
+          <label class="block text-xs font-bold text-emerald-400 uppercase">Savings Target (20%)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-slate-400 font-bold">₹</span>
+            <input type="number" id="math-save-input" placeholder="e.g. 480" class="w-full bg-slate-800 text-white font-mono font-bold pl-7 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-emerald-400">
+          </div>
+          <p id="math-save-feedback" class="text-[11px] text-slate-400">Calculated: 20% of ₹2,400</p>
+        </div>
+      </div>
+
+      <!-- Validation Error / Success Display -->
+      <div id="math-validation-msg" class="hidden p-3.5 rounded-xl text-xs font-medium"></div>
+
+      <div class="flex justify-end">
+        <button onclick="verifyMathBudget()" class="w-full sm:w-auto px-7 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold font-display rounded-xl transition">
+          Verify Math & Lock Budget <i class="fa-solid fa-check-double ml-1"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Stage 3 & 4: Compound Life Event Twist & Trade-off Matrix -->
+    <section id="stage-3" class="hidden bg-slate-800/90 rounded-2xl p-5 sm:p-7 border border-slate-700 shadow-2xl space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-700/80 pb-4">
+        <div>
+          <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">Round 3 & 4: Crisis Management</span>
+          <h2 class="font-display text-xl sm:text-2xl font-bold text-white">⚡ Compound Financial Shock!</h2>
+        </div>
+        <div class="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-3 py-1 rounded-lg text-xs font-bold animate-pulse font-mono">
+          Deficit: -₹400
+        </div>
+      </div>
+
+      <!-- Dual Twist Story Card -->
+      <div class="bg-rose-950/30 border border-rose-500/40 p-4 sm:p-5 rounded-xl space-y-4">
+        <div class="flex items-start space-x-3">
+          <div class="text-3xl p-2.5 bg-rose-500/20 rounded-xl">💥</div>
+          <div class="space-y-1">
+            <h3 class="font-bold text-rose-300 text-base sm:text-lg">Two Unexpected Events Hit Simultaneously!</h3>
+            <p class="text-xs sm:text-sm text-slate-300">
+              In real life, financial shocks rarely happen one at a time. Here is what happened this month:
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-700 space-y-1">
+            <span class="text-rose-400 font-bold block">1. Bus Fare Fuel Surcharge (+₹150)</span>
+            <p class="text-slate-400">School transport costs increased due to fuel prices. Essential NEED increase.</p>
+          </div>
+          <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-700 space-y-1">
+            <span class="text-rose-400 font-bold block">2. Laptop Screen Crack Repair (+₹250)</span>
+            <p class="text-slate-400">Screen cracked during class. Essential repair needed for homework.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 p-3 rounded-lg text-xs space-y-1 font-mono text-slate-300 border border-slate-700">
+          <div class="flex justify-between">
+            <span>Base Needs Allocation:</span>
+            <span class="text-cyan-400">₹1,200</span>
+          </div>
+          <div class="flex justify-between text-rose-400 font-bold">
+            <span>Total Shocks (+₹150 + ₹250):</span>
+            <span>+₹400</span>
+          </div>
+          <div class="flex justify-between border-t border-slate-700 pt-1 font-bold text-white">
+            <span>New Needs Requirement:</span>
+            <span class="text-rose-400">₹1,600 (Budget Deficit!)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trade-Off Strategic Matrix -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-300 uppercase">Select Options to Cover the ₹400 Deficit:</span>
+          <span class="text-xs text-cyan-400 font-mono">Multiple strategies possible</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Option A -->
+          <label class="p-3.5 bg-slate-900 rounded-xl border border-slate-700 hover:border-amber-400/50 cursor-pointer flex items-start space-x-3 transition">
+            <input type="checkbox" id="trade-opt-1" onchange="recalculateTradeOffs()" class="mt-1 accent-amber-400 w-4 h-4">
+            <div>
+              <span class="font-bold text-amber-400 text-xs sm:text-sm block">Cut Wants: Gaming & Cinema Outings</span>
+              <p class="text-xs text-slate-400">Skip buying game passes & movie popcorn this month.</p>
+              <span class="inline-block mt-1 text-xs font-mono font-bold text-emerald-400">+₹250 freed</span>
+            </div>
+          </label>
+
+          <!-- Option B -->
+          <label class="p-3.5 bg-slate-900 rounded-xl border border-slate-700 hover:border-emerald-400/50 cursor-pointer flex items-start space-x-3 transition">
+            <input type="checkbox" id="trade-opt-2" onchange="recalculateTradeOffs()" class="mt-1 accent-emerald-400 w-4 h-4">
+            <div>
+              <span class="font-bold text-emerald-400 text-xs sm:text-sm block">Dip into Emergency Reserve Savings</span>
+              <p class="text-xs text-slate-400">Use a portion of your ₹480 monthly savings deposit.</p>
+              <span class="inline-block mt-1 text-xs font-mono font-bold text-emerald-400">+₹150 freed</span>
+            </div>
+          </label>
+
+          <!-- Option C -->
+          <label class="p-3.5 bg-slate-900 rounded-xl border border-slate-700 hover:border-cyan-400/50 cursor-pointer flex items-start space-x-3 transition">
+            <input type="checkbox" id="trade-opt-3" onchange="recalculateTradeOffs()" class="mt-1 accent-cyan-400 w-4 h-4">
+            <div>
+              <span class="font-bold text-cyan-400 text-xs sm:text-sm block">Take Extra Weekend Dog-Walking Gig</span>
+              <p class="text-xs text-slate-400">Earn extra income through 4 hours of neighbor assistance.</p>
+              <span class="inline-block mt-1 text-xs font-mono font-bold text-emerald-400">+₹150 earned</span>
+            </div>
+          </label>
+
+          <!-- Option D -->
+          <label class="p-3.5 bg-slate-900 rounded-xl border border-slate-700 hover:border-indigo-400/50 cursor-pointer flex items-start space-x-3 transition">
+            <input type="checkbox" id="trade-opt-4" onchange="recalculateTradeOffs()" class="mt-1 accent-indigo-400 w-4 h-4">
+            <div>
+              <span class="font-bold text-indigo-400 text-xs sm:text-sm block">Downgrade Mobile Data Plan</span>
+              <p class="text-xs text-slate-400">Switch to Wi-Fi only for video streams at home.</p>
+              <span class="inline-block mt-1 text-xs font-mono font-bold text-emerald-400">+₹100 saved</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Live Calculation Bar -->
+      <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div>
+          <span class="text-xs text-slate-400">Deficit Balance Status:</span>
+          <p id="tradeoff-shortfall-text" class="font-display font-bold text-lg text-rose-400">₹400 needed</p>
+        </div>
+        <div id="tradeoff-badge" class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+          Unbalanced
+        </div>
+        <button id="btn-finish-quest" disabled onclick="finishQuest()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-700 text-slate-400 font-bold font-display rounded-lg cursor-not-allowed transition">
+          Complete Challenge <i class="fa-solid fa-trophy ml-1"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Stage 5: Certificate & Advanced Financial IQ Summary -->
+    <section id="stage-final" class="hidden bg-slate-800/90 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl text-center space-y-6">
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-amber-400 via-cyan-400 to-emerald-400 p-0.5 shadow-xl pulse-glow">
+        <div class="w-full h-full bg-slate-900 rounded-[22px] flex items-center justify-center text-4xl">
+          🎖️
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Simulation Complete</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Financial Mastermind Certified!</h2>
+        <p class="text-slate-300 text-xs sm:text-sm max-w-lg mx-auto">
+          You conquered advanced categorization nuances, calculated accurate 50/30/20 percentages, and absorbed a major dual financial shock!
+        </p>
+      </div>
+
+      <!-- Comprehensive Financial Report -->
+      <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-700 text-left space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="font-display font-bold text-white text-base">📊 Final Financial Health Scorecard</h3>
+            <p class="text-xs text-slate-400">Income base: ₹2,400 + Shock Rebalancing</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 block">Final Financial IQ</span>
+            <span id="final-iq-score" class="font-display font-bold text-cyan-400 text-xl">100 / 100</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div class="p-3 bg-slate-800/60 rounded-xl border border-cyan-500/30 space-y-1">
+            <span class="text-cyan-400 font-bold block">Needs (Shock Covered)</span>
+            <p class="text-lg font-bold text-white font-mono">₹1,600</p>
+            <p class="text-[11px] text-slate-400">Included transport increase & laptop repair.</p>
+          </div>
+
+          <div class="p-3 bg-slate-800/60 rounded-xl border border-amber-500/30 space-y-1">
+            <span class="text-amber-400 font-bold block">Wants (Adjusted)</span>
+            <p id="final-wants-val" class="text-lg font-bold text-white font-mono">₹470</p>
+            <p class="text-[11px] text-slate-400">Trimmed strategically to protect balance.</p>
+          </div>
+
+          <div class="p-3 bg-slate-800/60 rounded-xl border border-emerald-500/30 space-y-1">
+            <span class="text-emerald-400 font-bold block">Savings (Protected)</span>
+            <p id="final-savings-val" class="text-lg font-bold text-white font-mono">₹330 - ₹480</p>
+            <p class="text-[11px] text-slate-400">Cushion preserved for long term goals.</p>
+          </div>
+        </div>
+
+        <div class="bg-indigo-950/40 p-3.5 rounded-xl border border-indigo-500/30 flex items-start space-x-3">
+          <i class="fa-solid fa-graduation-cap text-indigo-400 text-xl mt-0.5"></i>
+          <div class="space-y-1 text-xs text-indigo-200">
+            <p class="font-bold text-white">Key Takeaway for Ages 12–14:</p>
+            <p>Budgeting isn't about restricting yourself—it's about <strong>control and resilience</strong>. When unexpected expenses occur, you don't panic or take harmful debt; you pull levers across Wants, Savings, or side earnings to adapt!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button onclick="downloadSummaryReport()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-display font-bold rounded-xl transition flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-file-arrow-down"></i>
+          <span>Download Performance Certificate</span>
+        </button>
+        <button onclick="resetQuest()" class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 font-display font-bold rounded-xl transition hover:opacity-90 flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>Replay Quest</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 border-t border-slate-800 py-3 px-4 text-center text-xs text-slate-500">
+    <p>50/30/20 Money Management Pro Challenge • Designed for Students Aged 12–14</p>
+  </footer>
+
+  <script>
+    /* ===================================================================
+       STATE & AUDIO SYNTHESIZER
+       =================================================================== */
+    const state = {
+      iqScore: 100,
+      soundEnabled: true,
+      currentStage: 0,
+      sortIdx: 0,
+      income: 2400,
+      targetNeed: 1200,
+      targetWant: 720,
+      targetSave: 480,
+      tradeOffs: {
+        opt1: false, // Cut Wants (+250)
+        opt2: false, // Dip Savings (+150)
+        opt3: false, // Dog Walking Gig (+150)
+        opt4: false  // Downgrade Mobile Plan (+100)
+      }
+    };
+
+    // Advanced, Nuanced Expense Dataset for 12-14 year olds
+    const sortItems = [
+      { id: 1, title: "Basic Mobile Data Plan", desc: "Required for online school portal & submitting homework.", cost: 300, category: "need", icon: "📱", hint: "Essential to prevent failing school assignments!" },
+      { id: 2, title: "Unlimited Gaming Battle Pass Upgrade", desc: "Cosmetic character skins and extra game levels.", cost: 450, category: "want", icon: "🎮", hint: "Can you still play the core game without this pass?" },
+      { id: 3, title: "Emergency Cushion Fund Deposit", desc: "Saving up for unexpected tech or health expenses.", cost: 480, category: "save", icon: "🛡️", hint: "This prepares you for future shocks!" },
+      { id: 4, title: "Monthly Bus Pass to School", desc: "Daily commute fare to attend classes.", cost: 600, category: "need", icon: "🚌", hint: "Mandatory daily transportation." },
+      { id: 5, title: "Branded Designer Sneakers (vs Standard Shoes)", desc: "Buying high-end logo sneakers instead of regular school shoes.", cost: 800, category: "want", icon: "👟", hint: "Basic shoes are a need; high-end brand markup is a want!" },
+      { id: 6, title: "Monthly Laptop Goal Savings", desc: "Deposit towards a ₹20,000 laptop for high school.", cost: 400, category: "save", icon: "💻", hint: "Long term asset building." }
+    ];
+
+    // Web Audio Synthesizer (No external sound files required)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!state.soundEnabled) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(250, now + 0.05);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'correct') {
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'wrong') {
+        osc.frequency.setValueAtTime(250, now);
+        osc.frequency.setValueAtTime(190, now + 0.1);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'win') {
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        osc.frequency.setValueAtTime(1046.50, now + 0.3);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+    }
+
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      const soundIcon = document.getElementById('sound-icon');
+      soundIcon.className = state.soundEnabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark text-rose-400";
+    }
+
+    function adjustIQScore(delta) {
+      state.iqScore = Math.max(50, Math.min(120, state.iqScore + delta));
+      document.getElementById('xp-display').innerText = state.iqScore;
+    }
+
+    function showStage(stageNum) {
+      state.currentStage = stageNum;
+      
+      ['stage-intro', 'stage-1', 'stage-2', 'stage-3', 'stage-final'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+
+      for (let i = 1; i <= 4; i++) {
+        const tab = document.getElementById(`step-tab-${i}`);
+        if (i < stageNum) {
+          tab.className = "step-indicator flex items-center space-x-1 text-emerald-400 font-bold";
+        } else if (i === stageNum) {
+          tab.className = "step-indicator active flex items-center space-x-1 text-cyan-400 font-bold";
+        } else {
+          tab.className = "step-indicator flex items-center space-x-1 text-slate-500";
+        }
+      }
+
+      if (stageNum === 0) document.getElementById('stage-intro').classList.remove('hidden');
+      if (stageNum === 1) document.getElementById('stage-1').classList.remove('hidden');
+      if (stageNum === 2) document.getElementById('stage-2').classList.remove('hidden');
+      if (stageNum === 3) document.getElementById('stage-3').classList.remove('hidden');
+      if (stageNum === 4) document.getElementById('stage-final').classList.remove('hidden');
+    }
+
+    function startSimulation() {
+      playSound('click');
+      showStage(1);
+      loadSortItem();
+    }
+
+    function loadSortItem() {
+      if (state.sortIdx >= sortItems.length) {
+        playSound('win');
+        adjustIQScore(15);
+        showStage(2);
+        return;
+      }
+
+      const item = sortItems[state.sortIdx];
+      document.getElementById('item-icon').innerText = item.icon;
+      document.getElementById('item-title').innerText = item.title;
+      document.getElementById('item-desc').innerText = item.desc;
+      document.getElementById('item-cost').innerText = `₹${item.cost}`;
+
+      const hintEl = document.getElementById('item-hint');
+      hintEl.innerText = `💡 ${item.hint}`;
+      hintEl.classList.remove('hidden');
+
+      document.getElementById('sort-progress-count').innerText = state.sortIdx + 1;
+      document.getElementById('sort-progress-bar').style.width = `${((state.sortIdx + 1) / sortItems.length) * 100}%`;
+    }
+
+    function sortActiveItem(chosenCategory) {
+      const currentItem = sortItems[state.sortIdx];
+      const feedbackEl = document.getElementById('sort-feedback');
+      feedbackEl.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/30', 'bg-rose-500/20', 'text-rose-300', 'border-rose-500/30');
+
+      if (chosenCategory === currentItem.category) {
+        playSound('correct');
+        adjustIQScore(5);
+        feedbackEl.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border', 'border-emerald-500/30');
+        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-base mr-1"></i> <span><strong>Correct!</strong> "${currentItem.title}" belongs in <strong>${chosenCategory.toUpperCase()}</strong>. Good analytical thinking!</span>`;
+      } else {
+        playSound('wrong');
+        adjustIQScore(-5);
+        feedbackEl.classList.add('bg-rose-500/20', 'text-rose-300', 'border', 'border-rose-500/30');
+        feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 text-base mr-1"></i> <span><strong>Tricky one!</strong> "${currentItem.title}" is actually a <strong>${currentItem.category.toUpperCase()}</strong>. ${currentItem.hint}</span>`;
+      }
+
+      state.sortIdx++;
+      setTimeout(() => {
+        feedbackEl.classList.add('hidden');
+        loadSortItem();
+      }, 1600);
+    }
+
+    function verifyMathBudget() {
+      playSound('click');
+      const needVal = parseInt(document.getElementById('math-need-input').value);
+      const wantVal = parseInt(document.getElementById('math-want-input').value);
+      const saveVal = parseInt(document.getElementById('math-save-input').value);
+
+      const msgEl = document.getElementById('math-validation-msg');
+      msgEl.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/30', 'bg-rose-500/20', 'text-rose-300', 'border-rose-500/30');
+
+      let errors = [];
+      if (needVal !== 1200) errors.push("Needs (50% of ₹2,400) should be ₹1,200.");
+      if (wantVal !== 720) errors.push("Wants (30% of ₹2,400) should be ₹720.");
+      if (saveVal !== 480) errors.push("Savings (20% of ₹2,400) should be ₹480.");
+
+      if (errors.length === 0) {
+        playSound('win');
+        adjustIQScore(15);
+        msgEl.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border', 'border-emerald-500/30');
+        msgEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> <strong>Flawless Math!</strong> ₹1,200 (Needs) + ₹720 (Wants) + ₹480 (Savings) = ₹2,400. Stage Unlocked!`;
+        
+        setTimeout(() => {
+          showStage(3);
+        }, 1200);
+      } else {
+        playSound('wrong');
+        adjustIQScore(-5);
+        msgEl.classList.add('bg-rose-500/20', 'text-rose-300', 'border', 'border-rose-500/30');
+        msgEl.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-1"></i> <strong>Check your math:</strong> ${errors.join(" ")}`;
+      }
+    }
+
+    function recalculateTradeOffs() {
+      playSound('click');
+      const opt1 = document.getElementById('trade-opt-1').checked;
+      const opt2 = document.getElementById('trade-opt-2').checked;
+      const opt3 = document.getElementById('trade-opt-3').checked;
+      const opt4 = document.getElementById('trade-opt-4').checked;
+
+      let freed = 0;
+      if (opt1) freed += 250;
+      if (opt2) freed += 150;
+      if (opt3) freed += 150;
+      if (opt4) freed += 100;
+
+      const totalDeficit = 400;
+      const remaining = totalDeficit - freed;
+
+      const textEl = document.getElementById('tradeoff-shortfall-text');
+      const badgeEl = document.getElementById('tradeoff-badge');
+      const btnEl = document.getElementById('btn-finish-quest');
+
+      if (remaining <= 0) {
+        textEl.innerText = "₹0 Deficit (Deficit Covered!)";
+        textEl.className = "font-display font-bold text-lg text-emerald-400";
+
+        badgeEl.className = "px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+        badgeEl.innerHTML = `<i class="fa-solid fa-shield-halved mr-1"></i> Balanced (+₹${Math.abs(remaining)} buffer)`;
+
+        btnEl.disabled = false;
+        btnEl.className = "w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold font-display rounded-lg transition cursor-pointer shadow-lg";
+      } else {
+        textEl.innerText = `₹${remaining} deficit remaining`;
+        textEl.className = "font-display font-bold text-lg text-rose-400";
+
+        badgeEl.className = "px-3 py-1 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40";
+        badgeEl.innerHTML = "Unbalanced";
+
+        btnEl.disabled = true;
+        btnEl.className = "w-full sm:w-auto px-6 py-2.5 bg-slate-700 text-slate-500 font-bold font-display rounded-lg cursor-not-allowed";
+      }
+
+      state.tradeOffs = { opt1, opt2, opt3, opt4 };
+    }
+
+    function finishQuest() {
+      playSound('win');
+      adjustIQScore(20);
+
+      let finalWants = 720;
+      let finalSave = 480;
+
+      if (state.tradeOffs.opt1) finalWants -= 250;
+      if (state.tradeOffs.opt2) finalSave -= 150;
+      if (state.tradeOffs.opt4) finalWants -= 100;
+
+      document.getElementById('final-wants-val').innerText = `₹${Math.max(0, finalWants)}`;
+      document.getElementById('final-savings-val').innerText = `₹${finalSave}`;
+      document.getElementById('final-iq-score').innerText = `${state.iqScore} / 120`;
+
+      showStage(4);
+    }
+
+    function downloadSummaryReport() {
+      playSound('click');
+      const reportText = `=====================================================
+50/30/20 BUDGETING QUEST (PRO ADVANCED EDITION)
+STUDENT PERFORMANCE CERTIFICATE & FINANCIAL REPORT
+=====================================================
+Date: ${new Date().toLocaleDateString()}
+Target Audience: Middle School (Ages 12–14)
+Financial IQ Score: ${state.iqScore} / 120
+
+1. INCOME & BASE ALLOCATION MATH:
+- Monthly Income Base: ₹2,400
+- Needs Target (50%): ₹1,200
+- Wants Target (30%): ₹720
+- Savings Target (20%): ₹480
+
+2. CRISIS SHOCK RESPONSE REPORT:
+- Unexpected Shock Total: ₹400 (Bus Surcharge + Laptop Screen Repair)
+- Adjusted Needs Total: ₹1,600
+- Final Wants Budget: ${document.getElementById('final-wants-val').innerText}
+- Final Savings Budget: ${document.getElementById('final-savings-val').innerText}
+
+3. STRATEGIC LESSONS MASTERED:
+- Differentiating disguised wants from true essentials.
+- Calculating exact percentage budget allocations.
+- Rebalancing trade-offs across income, wants, and savings during real-world shocks.
+=====================================================`;
+
+      const element = document.createElement('a');
+      const file = new Blob([reportText], {type: 'text/plain'});
+      element.href = URL.createObjectURL(file);
+      element.download = '50-30-20-Pro-Challenge-Certificate.txt';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    function resetQuest() {
+      playSound('click');
+      state.iqScore = 100;
+      state.sortIdx = 0;
+      document.getElementById('xp-display').innerText = '100';
+      showStage(0);
+    }
+  </script>
+</body>
+</html>
